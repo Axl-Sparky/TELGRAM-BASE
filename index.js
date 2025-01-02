@@ -18,7 +18,7 @@ const app = express();
 app.use(express.static(path.join(__dirname, 'src')));
 
 // Notify route for incoming requests
-app.post('/notify', async (req, res) => {
+app.post('/', async (req, res) => {
   const chatId = "6524787237"; // Replace with your Telegram chat ID
   const message = "Someone accessed your Koyeb URL!";
 
