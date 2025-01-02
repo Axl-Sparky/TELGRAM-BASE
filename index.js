@@ -59,9 +59,9 @@ bot.on('polling_error', (error) => {
 });
 
 // Set up a basic HTTP server to bind to a port (required by Render)
-app.get('/', (req, res) => {
+/*app.get('/', (req, res) => {
   res.send('Telegram bot is running...');
-});
+});*/
 
 // Start the HTTP server
 app.listen(port, () => {
