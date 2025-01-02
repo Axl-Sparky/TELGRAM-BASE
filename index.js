@@ -64,16 +64,8 @@ app.get('/', (req, res) => {
  
 const chatId = "6524787237"; // Replace with your Telegram chat ID
   const message = "Someone accessed your Koyeb URL!";
-
-
-try {
     await bot.sendMessage(chatId, message);
     res.status(200).send('Notification sent');
-  } catch (error) {
-    console.error('Error sending notification:', error);
-    res.status(500).send('Failed to send notification');
-}
- 
 });
 
 
