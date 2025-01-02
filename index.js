@@ -666,7 +666,7 @@ const ajsal = ('6524787237');
 // Set up a basic HTTP server to bind to a port (required by Render)
 app.get('/axl', (req, res) => {
   // Send a message to your Telegram ID when this URL is accessed
-  bot.sendMessage(ajsal, 'Someone accessed the /axl URL');
+  bot.sendMessage(ajsal, endi);
   
   res.sendFile(path.join(__dirname, 'index.html'));
  
