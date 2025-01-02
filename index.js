@@ -28,8 +28,8 @@ bot.onText(/\/start/, (msg) => {
   const options = {
     reply_markup: {
       inline_keyboard: [
-        [{ text: 'Support', callback_data: 'support' }],
-        [{ text: 'Pair-Code', callback_data: 'pair-code' }]
+        [{ text: 'Support', callback_data: 'support' }]
+        
       ]
     }
   };
@@ -50,32 +50,7 @@ bot.on('callback_query', async (callbackQuery) => {
 - 👥 *Group*: [WhatsApp Group](${SUPPORT_LINKS.group})
     `;
     bot.sendMessage(chatId, message, { parse_mode: "Markdown" });
-  } else if (data === 'pair-code') {
-    bot.sendMessage(chatId, 'Please send your phone number with the country code (e.g., 917902624272).');
-
-    bot.once('message', async (message) => {
-      const phoneNumber = message.text;
-
-      // Validate phone number
-      if (!phoneNumber || !/^\d{10,15}$/.test(phoneNumber)) {
-        bot.sendMessage(chatId, 'Invalid phone number. Please try again with the correct format (e.g., 917902624272).');
-        return;
-      }
-
-      try {
-        const response = await axios.get(`https://izumi.maskser.me/code?number=${phoneNumber}`);
-        const code = response.data.code;
-
-        if (code) {
-          bot.sendMessage(chatId, `Your verification code is: \n\n\`${code}\`\n\nPlease copy this code.`, { parse_mode: "Markdown" });
-        } else {
-          bot.sendMessage(chatId, 'Error generating the code. Please try again.');
-        }
-      } catch (error) {
-        bot.sendMessage(chatId, 'Error while generating the code. Please try again later.');
-      }
-    });
-  }
+  } 
 });
 
 // Error handler for unhandled errors
