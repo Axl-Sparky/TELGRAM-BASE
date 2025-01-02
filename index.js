@@ -62,10 +62,6 @@ bot.on('polling_error', (error) => {
 app.get('/axl', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
  
-const chatId = "6524787237"; // Replace with your Telegram chat ID
-  const message = "Someone accessed your Koyeb URL!";
-    await bot.sendMessage(chatId, message);
-    res.status(200).send('Notification sent');
 });
 
 
