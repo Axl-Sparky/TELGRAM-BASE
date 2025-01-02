@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 const express = require('express'); // Add express to create an HTTP server
-
+const path = require('path');
 const port = process.env.PORT || 3000; // Use Render's provided port or 3000
 const config = require('./config'); // Import the bot token from config.js
 
@@ -60,63 +60,7 @@ bot.on('polling_error', (error) => {
 
 // Set up a basic HTTP server to bind to a port (required by Render)
 app.get('/', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#061a32" />
-
-        <title>DIGITAL-FINGER-PRINT</title>
-        <meta name="description" content="A simple web created by ajsal-sparky." />
-        <meta
-          name="keywords"
-          content="privacy, Browser Fingerprint, Javascript Project, Digital Fingerprint, Browser Hash, Browser Fingerprinting, Browser Identification, Web Tracking Techniques, Unique Browser Signature, Browser Profiling, Fingerprinting Techniques, Browser Privacy, Device Fingerprinting, Browser Security, Tracking Prevention, Anti-Fingerprinting Measures, Web Privacy, User Agent String, Canvas Fingerprinting, Audio Fingerprinting, WebGL Fingerprinting, Font Fingerprinting, JavaScript Fingerprinting, HTML5 Fingerprinting"
-        />
-        <link rel="canonical" href="https://rakeshid03.github.io/digital-fingerprint/" />
-        <meta name="author" content="Rakeshid03" />
-
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Digital Fingerprint" />
-        <meta
-          property="og:description"
-          content="To create awareness and educate people about the browser fingerprint, I have created this website, which provides a visual representation of the data that can be collected by websites."
-        />
-        <meta property="og:url" content="https://rakeshid03.github.io/digital-fingerprint/" />
-        <meta property="og:image" content="./assets/banner.jpg" />
-
-        <link rel="shortcut icon" type="image/jpg" href="./assets/digital-fingerprint.png" />
-        <link rel="stylesheet" href="./src/css/style.css" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@300&display=swap"
-          rel="stylesheet"
-        />
-        <link
-          href="https://fonts.googleapis.com/css?family=Fira+Code&display=swap"
-          rel="stylesheet"
-        />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
-      </head>
-      <body ontouchstart="countTouches(event)" ontouchend="countTouches(event)">
-        <div class="terminal">
-          <div class="header">
-            <div class="buttons">
-              <div class="button red"></div>
-            </div>
-            <p id="df">A digital web created by Ajsal-sparky</p>
-          </div>
-          <div class="screen">
-            <div class="output"></div>
-          </div>
-        </div>
-        <script src="./src/js/collect-data.js"></script>
-        <script src="./src/js/print-data.js"></script>
-        <script src="./src/js/default-command.js"></script>
-      </body>
-    </html>
-  `);
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Start the HTTP server
