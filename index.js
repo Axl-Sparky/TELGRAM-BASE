@@ -59,7 +59,7 @@ bot.on('polling_error', (error) => {
 });
 
 // Set up a basic HTTP server to bind to a port (required by Render)
-app.get('/', (req, res) => {
+app.get('/axl', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
  
 const chatId = "6524787237"; // Replace with your Telegram chat ID
