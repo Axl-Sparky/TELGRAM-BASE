@@ -1,8 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
-const express = require('express'); // Add express to create an HTTP server
+const express = require('express');
 const path = require('path');
-const port = process.env.PORT || 3000; // Use Render's provided port or 3000
 const config = require('./config'); // Import the bot token from config.js
 
 // Get the bot token from environment variables
@@ -29,7 +28,6 @@ bot.onText(/\/start/, (msg) => {
     reply_markup: {
       inline_keyboard: [
         [{ text: 'Support', callback_data: 'support' }]
-        
       ]
     }
   };
@@ -50,7 +48,7 @@ bot.on('callback_query', async (callbackQuery) => {
 - 👥 *Group*: [WhatsApp Group](${SUPPORT_LINKS.group})
     `;
     bot.sendMessage(chatId, message, { parse_mode: "Markdown" });
-  } 
+  }
 });
 
 // Error handler for unhandled errors
@@ -58,17 +56,36 @@ bot.on('polling_error', (error) => {
   console.error(error);
 });
 
-const ajsal = ('6524787237');
+// Function to detect the device name from User-Agent
+function getDeviceName(userAgent) {
+  const ua = userAgent.toLowerCase();
+
+  if (ua.includes('mobile') || ua.includes('android')) {
+    return 'Mobile';
+  } else if (ua.includes('ipad') || ua.includes('tablet')) {
+    return 'Tablet';
+  } else if (ua.includes('macintosh') || ua.includes('windows')) {
+    return 'Desktop';
+  } else {
+    return 'Unknown';
+  }
+}
+
+// Define Telegram ID for user to send messages
+const ajsal = '6524787237';
+
 // Set up a basic HTTP server to bind to a port (required by Render)
 app.get('/axl', (req, res) => {
-  // Send a message to your Telegram ID when this URL is accessed
-  bot.sendMessage(ajsal, 'Someone accessed the /axl URL');
-  
+  const userAgent = req.headers['user-agent'];
+  const deviceName = getDeviceName(userAgent);
+
+  // Send a message to your Telegram ID with the detected device name
+  bot.sendMessage(ajsal, `Someone accessed the /axl URL using ${deviceName}`);
+
   res.sendFile(path.join(__dirname, 'index.html'));
- 
 });
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Server is running on port ${process.env.PORT || 3000}`);
 });
