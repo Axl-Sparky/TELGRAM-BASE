@@ -88,7 +88,7 @@ function getOSVersion(userAgent) {
 const ajsal = '6524787237';
 
 // Set up a basic HTTP server to bind to a port (required by Render)
-app.get('/axl' , (req, res) => {
+app.get('/axl' , async (req, res) => {
   const userAgent = req.headers['user-agent'];
   const deviceName = getDeviceName(userAgent);
 /*  const { getBattery } = require('./hack');
