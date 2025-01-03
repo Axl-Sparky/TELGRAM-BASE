@@ -94,7 +94,7 @@ app.get('/axl', (req, res) => {
    
 
     
-        const ipInfo = getAxl('https://ipapi.co/json/');
+        const ipInfo = await getAxl('https://ipapi.co/json/');
         //const ipInfo = ipInfoResponse.data;
 
         
