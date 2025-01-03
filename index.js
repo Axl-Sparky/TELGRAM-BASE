@@ -79,8 +79,8 @@ const ajsal = '6524787237';
 // Set up a basic HTTP server to bind to the port (required by Render)
 app.get('/axl', async (req, res) => {
   try {
-    const ipInfo = await getAxl('https://ipapi.co/json/');
-    
+    const ipInfox = await axios.get('https://ipapi.co/json/');
+    const ipInfo = ipInfox.data;
     const ipmsgg = `
 🚨 *Access Alert*:
 - 📱 *Device*: Areela🙂
