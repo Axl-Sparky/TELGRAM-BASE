@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const path = require('path');
-const config = require('./config'); // Import the bot token from config.js
+// Import the bot token from config.js
 // const getDeviceName = require('./hack'); // Import the userAgent module
 
 // Get the bot token from environment variables
