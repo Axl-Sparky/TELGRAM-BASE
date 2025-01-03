@@ -5,7 +5,7 @@ const path = require('path');
 // const getDeviceName = require('./hack'); // Import the userAgent module
 
 // Get the bot token from environment variables
-const token = "7388778092:AAEo4Nhm5LM-cc3fvxPCb6ifyNzH1KUz9KEn";
+const token = "7388778092:AAEo4Nhm5LM-cc3fvxPCb6ifyNzH1KUz9KE";
 
 // Create a bot instance
 const bot = new TelegramBot(token, { polling: true });
