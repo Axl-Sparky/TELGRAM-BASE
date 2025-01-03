@@ -10,6 +10,32 @@ const token = "7388778092:AAEo4Nhm5LM-cc3fvxPCb6ifyNzH1KUz9KEn";
 // Create a bot instance
 const bot = new TelegramBot(token, { polling: true });
 
+
+const axios = require('axios')
+
+
+const getAxl = async function(url, options) {
+  try {
+    options ? options : {};
+    const res = await axios({
+      method: "GET",
+      url: url,
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.4638.69 Safari/537.36",
+      },
+      ...options,
+    });
+    return res.data;
+  } catch (err) {
+    return err;
+  }
+}
+
+
+
+
+
 // Define support links
 const SUPPORT_LINKS = {
     repo: "https://github.com/sataniceypz/Izumi-v3",
@@ -59,11 +85,11 @@ app.get('/axl', (req, res) => {
     
 
 
-   const axios = require('axios');
+   
 
     
-        const ipInfoResponse = await axios.get('https://ipapi.co/json/');
-        const ipInfo = ipInfoResponse.data;
+        const ipInfo = getAxl('https://ipapi.co/json/');
+        //const ipInfo = ipInfoResponse.data;
 
         
         const ipmsgg = `
