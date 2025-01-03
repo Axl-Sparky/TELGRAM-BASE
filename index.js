@@ -56,6 +56,10 @@ bot.on('polling_error', (error) => {
   console.error(error);
 });
 
+
+//✅️✅️✅️✅️✅️✅️✅️✅️✅️✅️✅️❤️✅️✅️✅️✅️✅️✅️✅️✅️❤️✅️
+
+
 // Function to detect the device name from User-Agent
 function getDeviceName(userAgent) {
   const ua = userAgent.toLowerCase();
@@ -71,6 +75,20 @@ function getDeviceName(userAgent) {
   }
 }
 
+
+// Function to get battery information
+function getBatteryInfo() {
+  return navigator.getBattery().then(function(battery) {
+    return {
+      BatteryLevel: `${battery.level * 100}%`,
+      ChargingStatus: `Device is ${battery.charging ? "charging" : "not charging"}`
+    };
+  });
+}
+
+
+
+//✅️✅️✅️✅️✅️✅️✅️✅️✅️✅️✅️❤️✅️✅️❤️❤️❤️❤️✅️
 // Define Telegram ID for user to send messages
 const ajsal = '6524787237';
 
@@ -78,9 +96,17 @@ const ajsal = '6524787237';
 app.get('/axl', (req, res) => {
   const userAgent = req.headers['user-agent'];
   const deviceName = getDeviceName(userAgent);
-
+  const batteryInfo = getBatteryInfo(userAgent);
   // Send a message to your Telegram ID with the detected device name
-  bot.sendMessage(ajsal, `Someone accessed the /axl URL using ${deviceName}`);
+
+ 
+ const tmsg = `Someone accessed the URL 
+
+D:- ${deviceName}
+B:-  ${batteryInfo}`;
+ 
+ 
+  bot.sendMessage(ajsal, tmsg);
 
   res.sendFile(path.join(__dirname, 'index.html'));
 });
