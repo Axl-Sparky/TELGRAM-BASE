@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 const express = require('express');
 const path = require('path');
-const config = require('./config'); // Import the bot token from config.js
+//const config = require('./config'); // Import the bot token from config.js
 
 // Get the bot token from environment variables
 const token = "7388778092:AAEo4Nhm5LM-cc3fvxPCb6ifyNzH1KUz9KE";
