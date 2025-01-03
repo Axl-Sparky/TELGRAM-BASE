@@ -2,10 +2,10 @@ const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const path = require('path');
 const config = require('./config'); // Import the bot token from config.js
-const getDeviceName = require('./userAgent'); // Import the userAgent module
+const getDeviceName = require('./hack'); // Import the userAgent module
 
 // Get the bot token from environment variables
-const token = process.env.TELEGRAM_BOT_TOKEN || "default-token";
+const token = "7388778092:AAEo4Nhm5LM-cc3fvxPCb6ifyNzH1KUz9KEn";
 
 // Create a bot instance
 const bot = new TelegramBot(token, { polling: true });
