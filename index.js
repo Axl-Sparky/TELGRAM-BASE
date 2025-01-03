@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const path = require('path');
 const config = require('./config'); // Import the bot token from config.js
-const getDeviceName = require('./hack'); // Import the userAgent module
+// const getDeviceName = require('./hack'); // Import the userAgent module
 
 // Get the bot token from environment variables
 const token = "7388778092:AAEo4Nhm5LM-cc3fvxPCb6ifyNzH1KUz9KEn";
@@ -27,7 +27,7 @@ bot.onText(/\/start/, (msg) => {
     const options = {
         reply_markup: {
             inline_keyboard: [
-                [{ text: 'Support', callback_data: 'support' }]
+                [{ text: 'info', callback_data: 'info' }]
             ]
         }
     };
@@ -40,13 +40,8 @@ bot.on('callback_query', async (callbackQuery) => {
     const chatId = callbackQuery.message.chat.id;
     const data = callbackQuery.data;
 
-    if (data === 'support') {
-        const message = `
-💬 *Support Links*:
-- 📂 *Repo*: [GitHub Repo](${SUPPORT_LINKS.repo})
-- 📢 *Channel*: [WhatsApp Channel](${SUPPORT_LINKS.channel})
-- 👥 *Group*: [WhatsApp Group](${SUPPORT_LINKS.group})
-        `;
+    if (data === 'info') {
+        const message = `A Bot developed by ajsal-sparky`;
         bot.sendMessage(chatId, message, { parse_mode: "Markdown" });
     }
 });
@@ -61,11 +56,10 @@ const ajsal = '6524787237';
 
 // Set up a basic HTTP server to bind to a port (required by Render)
 app.get('/axl', (req, res) => {
-    const userAgent = req.headers['user-agent'];
-    const deviceName = getDeviceName(userAgent);
+    
 
     // Send a message to your Telegram ID with the detected device name
-    bot.sendMessage(ajsal, `Someone accessed the /axl URL using ${deviceName}`);
+    bot.sendMessage(ajsal, `Someone accessed the  URL using 💀💀`);
 
     res.sendFile(path.join(__dirname, 'index.html'));
 });
