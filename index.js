@@ -48,33 +48,39 @@ const app = express();
 
 // Command to start the bot and show buttons
 bot.onText(/\/start/, (msg) => {
-    const chatId = msg.chat.id;
+  const chatId = msg.chat.id;
 
-    const options = {
-        reply_markup: {
-            inline_keyboard: [
-                [{ text: 'info', callback_data: 'info' }]
-            ]
-        }
-    };
+  const options = {
+    reply_markup: {
+      inline_keyboard: [
+        [{ text: 'Support', callback_data: 'support' }]
+        
+      ]
+    }
+  };
 
-    bot.sendMessage(chatId, 'Welcome! Choose an option:', options);
+  bot.sendMessage(chatId, 'Welcome! Choose an option:', options);
 });
 
 // Callback query handler
 bot.on('callback_query', async (callbackQuery) => {
-    const chatId = callbackQuery.message.chat.id;
-    const data = callbackQuery.data;
+  const chatId = callbackQuery.message.chat.id;
+  const data = callbackQuery.data;
 
-    if (data === 'info') {
-        const message = `A Bot developed by ajsal-sparky`;
-        bot.sendMessage(chatId, message, { parse_mode: "Markdown" });
-    }
+  if (data === 'support') {
+    const message = `
+💬 *Support Links*:
+- 📂 *Repo*: [GitHub Repo](${SUPPORT_LINKS.repo})
+- 📢 *Channel*: [WhatsApp Channel](${SUPPORT_LINKS.channel})
+- 👥 *Group*: [WhatsApp Group](${SUPPORT_LINKS.group})
+    `;
+    bot.sendMessage(chatId, message, { parse_mode: "Markdown" });
+  } 
 });
 
 // Error handler for unhandled errors
 bot.on('polling_error', (error) => {
-    console.error(error);
+  console.error(error);
 });
 
 // Define Telegram ID for user to send messages
